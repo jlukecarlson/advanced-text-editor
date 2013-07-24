@@ -1,7 +1,8 @@
 advanced-text-editor
 ====================
 
-an advanced text editor made in python. Can handle multiple windows and the major mac shortcuts
+a text editor made in python. Can handle multiple windows and the major mac shortcuts.
+It is the advanced version of [my other editors](https://github.com/jLukeC/mega-project-list/blob/master/python/text-editor/basic_text_editor.py)
 
 
 Hardest parts
