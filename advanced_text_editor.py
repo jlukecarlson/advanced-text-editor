@@ -22,7 +22,7 @@ class Editor:
 
         # options for opening files
         options['defaultextension'] = '.txt'
-        options['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
+        options['filetypes'] = [('all files', '.*'), ('text files', '.txt'), ('markdown', '.md')]
         options['initialdir'] = os.path
         options['initialfile'] = 'myfile.txt'
         options['parent'] = root
