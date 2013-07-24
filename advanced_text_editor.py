@@ -6,14 +6,14 @@ class Window():
     def __init__(self, parent):
         self.filename =''
         self.window = Toplevel(parent)
-        self.text_box = Text(self.window)
+        self.text_box = Text(self.window, background="black", foreground="firebrick")
         self.text_box.pack(expand = 1, fill= BOTH)
         self.text_box.focus_set()
        
 class Editor:
     file_name = ""
     def __init__(self, master):
-        initial_text_box = Text(root)
+        initial_text_box = Text(root, background="black", foreground="firebrick", insertbackground="white")
         initial_text_box.pack(expand = 1, fill= BOTH)
         initial_text_box.focus_set()
         initial_text_box.insert(END, """This is a text editor made by Luke Carlson (github.com/jLukeC).""")
@@ -48,6 +48,9 @@ class Editor:
            
 
         menubar = Menu(root)
+        menubar.add_command(label="Hello!", command=find_focus)
+        menubar.add_command(label="fds!", command=find_focus)
+        
         filemenu = Menu(menubar, tearoff=0)
         filemenu.add_command(label="New", command=self.new_window, accelerator="Command+N")
         filemenu.add_command(label="Open", command=self.open_file, accelerator="Command+O")
