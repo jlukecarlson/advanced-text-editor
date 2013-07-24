@@ -1,31 +1,23 @@
 from Tkinter import *
 import tkFileDialog
-import os, sys# inspect,
-
+import os, sys
 
 class Window():
-    file_name=''
-    text_box = ''
     def __init__(self, parent):
-        window = Toplevel(parent)
-        self.text_box = Text(window)
+        self.filename =''
+        self.window = Toplevel(parent)
+        self.text_box = Text(self.window)
         self.text_box.pack(expand = 1, fill= BOTH)
         self.text_box.focus_set()
- #          button = Button(window, text="Do nothing button")
-#           button.pack()
-
-        
+       
 class Editor:
-    file_name = "" # etc Users/Luke/programming/info.txt
-    
+    file_name = ""
     def __init__(self, master):
         initial_text_box = Text(root)
         initial_text_box.pack(expand = 1, fill= BOTH)
         initial_text_box.focus_set()
-        initial_text_box.insert(END, """This is a simple text editor. Type the path of the file you want to load/save in
-the small input box on the lower left of this window.""")
+        initial_text_box.insert(END, """This is a text editor made by Luke Carlson (github.com/jLukeC).""")
 
-        #window = Window()
         self.file_opt = options = {}
 
         # options for opening files
@@ -47,12 +39,12 @@ the small input box on the lower left of this window.""")
         
 
 
-        def donothing():
-           print root.focus_get()
         def find_focus():
            focus= root.focus_get()
            print focus
            print focus.get(1.0, END)
+           print focus.master
+           focus.master.wm_title("focused")
            
 
         menubar = Menu(root)
@@ -67,7 +59,7 @@ the small input box on the lower left of this window.""")
 
                              
         editmenu = Menu(menubar, tearoff=0)
-        editmenu.add_command(label="Undo", command=donothing)
+        editmenu.add_command(label="Undo", command=find_focus)
         editmenu.add_separator()
         editmenu.add_command(label="Cut", command=self.cut, accelerator="Command+X")
         editmenu.add_command(label="Copy", command=self.copy, accelerator="Command+C")
@@ -78,8 +70,8 @@ the small input box on the lower left of this window.""")
 
                              
         helpmenu = Menu(menubar, tearoff=0)
-        helpmenu.add_command(label="Help Index", command=find_focus)
-        helpmenu.add_command(label="About...", command=donothing)
+        helpmenu.add_command(label="Find Focus", command=find_focus)
+        helpmenu.add_command(label="About", command=self.about)
         menubar.add_cascade(label="Help", menu=helpmenu)
 
         root.config(menu=menubar)
@@ -87,37 +79,37 @@ the small input box on the lower left of this window.""")
         root.bind_all("<Command-n>", self.new_window)
         root.bind_all("<Command-o>", self.open_file)
         root.bind_all("<Command-s>", self.save_file)
-        root.bind_all("<Command-Shift-s>", self.save_as_file)
+        root.bind_all("<Command-Shift-s>", self.save_as_file) #doesnt work
+        root.bind_all("<Command-a>", self.select_all)
         root.bind_all("<Command-q>", self.quit_project)
         
     def open_file(self, event=''):
         open_file = tkFileDialog.askopenfile(mode='r', **self.file_opt)
-        window.text_box.delete(1.0, END)
-        window.text_box.insert(END, open_file.read())
-        self.file_name = open_file.name
-        print self.file_name
+        window_app = Window(root)
+        window_app.text_box.delete(1.0, END)
+        window_app.text_box.insert(END, open_file.read())
+        window_app.file_name = open_file.name
+        window_app.window.wm_title(window_app.file_name)
+        print window_app.file_name
 
     def save_file(self, event=''):
-        pass
-        if (self.file_name == ''):
+        focus=root.focus_get()
+        if (focus.master.title() == '' or focus.master.title() == "Luke's Text Editor"):
             self.save_as_file()
         else:
-            focus=root.focus_get()
-            save_file = open(self.file_name, 'w')
-            save_file.write(focus.get(1.0, END))
-            self.file_name = save_file.name
+             save_file = open(focus.master.wm_title(), 'w')
+             save_file.write(focus.get(1.0, END))
     
     def save_as_file(self, event=''):
         focus=root.focus_get()
         save_file = tkFileDialog.asksaveasfile(mode='w', **self.file_opt)
         save_file.write(focus.get(1.0, END))
-        self.file_name = save_file.name
-        print self.file_name
-
+        focus.master.wm_title(save_file.name)
+        print focus.master.title()
 
     def copy(self):
         focus=root.focus_get()
-        root.clipboard_clear() #is this needed?
+        root.clipboard_clear()
         root.clipboard_append(focus.selection_get())
 
     def cut(self):
@@ -133,13 +125,22 @@ the small input box on the lower left of this window.""")
         focus=root.focus_get()
         focus.delete(SEL_FIRST, SEL_LAST)
         
+    def select_all(self, event=''):
+        focus=root.focus_get()
+        focus.tag_add("sel","1.0","end")
+        
     def new_window(self, event=''):
-        self.app = Window(root)#root.another_window = Window()
-   #     window = Toplevel(root) #, takefocus=True
-#        self.app = Window(window)#root.another_window = Window()
+        self.window_app = Window(root)
 
+    def about(self):
+        about_window = Toplevel(root)
+        about_window.wm_title("About")
+        info = Label(about_window, text="""This is a text editor made by Luke Carlson (github.com/jLukeC) over a few days in summer 2013.""")
+        info.pack()
+        
     def quit_project(self):
         sys.exit()
+        
 if __name__=='__main__':
     root = Tk()
     root.wm_title("Luke's Text Editor")
