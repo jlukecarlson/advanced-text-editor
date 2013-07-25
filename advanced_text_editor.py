@@ -1,7 +1,7 @@
 from Tkinter import *
 import tkFileDialog
 import os, sys, inspect
-
+import markdown2
 main_path= os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe() ))[0]))
 dependencies_path = os.path.join(main_path, 'dependencies')
 sys.path.append(dependencies_path)
@@ -12,13 +12,16 @@ class Window():
     def __init__(self, parent):
         self.filename =''
         self.window = Toplevel(parent)
-        self.text_box = Text(self.window, background="black", foreground="firebrick")
+        self.text_box = Text(self.window, background="black", foreground="firebrick", insertbackground="white")
         self.text_box.pack(expand = 1, fill= BOTH)
         self.text_box.focus_set()
        
 class Editor:
-    file_name = ""
     def __init__(self, master):
+        self.file_name = ""
+        self.html_window=""
+        #self.html_viewer=""
+        
         initial_text_box = Text(root, background="black", foreground="firebrick", insertbackground="white")
         initial_text_box.pack(expand = 1, fill= BOTH)
         initial_text_box.focus_set()
@@ -28,7 +31,7 @@ class Editor:
 
         # options for opening files
         options['defaultextension'] = '.txt'
-        options['filetypes'] = [('all files', '.*'), ('text files', '.txt'), ('markdown', '.md')]
+        options['filetypes'] = [('all files', '.*'), ('text files', '.txt'), ('markdown', '.md'), ('html', '.html')]
         options['initialdir'] = os.path
         options['initialfile'] = 'myfile.txt'
         options['parent'] = root
@@ -86,6 +89,9 @@ class Editor:
 
         root.config(menu=menubar)
 
+
+        root.bind_all("<Command-m>", self.view_html)
+
         root.bind_all("<Command-n>", self.new_window)
         root.bind_all("<Command-o>", self.open_file)
         root.bind_all("<Command-s>", self.save_file)
@@ -93,6 +99,41 @@ class Editor:
         root.bind_all("<Command-a>", self.select_all)
         root.bind_all("<Command-w>", self.destroy)
         root.bind_all("<Command-q>", self.quit_project)
+
+
+    def view_html(self, event=''):
+        focus=root.focus_get()
+        file_extension = os.path.splitext(focus.master.title())[1]
+        print file_extension
+        if (file_extension == ".md"): #checks if it is markdown
+            html = markdown2.markdown(focus.get(1.0, END))
+            print html
+            save_file = open(os.path.splitext(focus.master.title())[0] + ".html", 'w')
+            save_file.write(html)
+            print save_file.name
+            launch_html_viewer(url=save_file.name)
+        else:
+            launch_html_viewer()
+            
+    def launch_html_viewer(self, event='', url=''):
+        focus=root.focus_get()
+        if url == '':
+            url = focus.master.title()
+        if self.html_window == '':
+            self.html_window=Toplevel(root)
+            self.html_window.wm_title("HTML Viewer")
+            self.html_viewer=tkHTMLViewer(self.html_window)
+            try:
+                self.html_viewer.display(url)
+            except:
+                print "html section couldnt work"
+        else:
+            self.html_viewer.display(url)
+            try:
+                self.html_viewer.display(focus.master.title())
+            except:
+                print "html section couldnt work"
+  
         
     def open_file(self, event=''):
         open_file = tkFileDialog.askopenfile(mode='r', **self.file_opt)
@@ -157,10 +198,10 @@ class Editor:
         focus_parent.wm_withdraw()
         try:
             focus_parent.wm_withdraw()
-        except: print "damn1"
+        except: pass
         try:
             focus_parent.destroy()
-        except: print "damn"
+        except: pass
 
     def quit_project(self):
         sys.exit()
@@ -172,3 +213,4 @@ if __name__=='__main__':
     root.mainloop()
 
 # great colors list http://wiki.tcl.tk/16166
+# thank you http://www.pysol.org/ for the html viewer code (and the destroy code)

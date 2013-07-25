@@ -1,5 +1,10 @@
 *.py[cod]
 *.pyc
+*~
+dependencies/
+index.html
+advanced_text_editor_html.py
+practice.py
 
 # C extensions
 *.so
