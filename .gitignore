@@ -1,7 +1,11 @@
 *.py[cod]
 *.pyc
 *~
+<<<<<<< HEAD
 myfile*
+=======
+.gitignore~
+>>>>>>> 19b6f95f53bd6696f3abd96e5b33aef3f836c0a2
 dependencies/
 index.html
 advanced_text_editor_html.py
