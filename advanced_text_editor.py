@@ -150,3 +150,4 @@ if __name__=='__main__':
     app = Editor(root)
     root.mainloop()
 
+# great colors list http://wiki.tcl.tk/16166
