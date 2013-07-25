@@ -1,6 +1,12 @@
 from Tkinter import *
 import tkFileDialog
-import os, sys
+import os, sys, inspect
+
+main_path= os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe() ))[0]))
+dependencies_path = os.path.join(main_path, 'dependencies')
+sys.path.append(dependencies_path)
+from tkhtml import *
+from tkutil import unbind_destroy
 
 class Window():
     def __init__(self, parent):
@@ -57,6 +63,7 @@ class Editor:
         filemenu.add_command(label="Save", command=self.save_file, accelerator="Command+S")
         filemenu.add_command(label="Save as...", command=self.save_as_file)
         filemenu.add_separator()
+        filemenu.add_command(label="Close Window", command=self.destroy, accelerator="Command+W")
         filemenu.add_command(label="Exit", command=self.quit_project, accelerator="Command+Q")
         menubar.add_cascade(label="File", menu=filemenu)
 
@@ -84,6 +91,7 @@ class Editor:
         root.bind_all("<Command-s>", self.save_file)
         root.bind_all("<Command-Shift-s>", self.save_as_file) #doesnt work
         root.bind_all("<Command-a>", self.select_all)
+        root.bind_all("<Command-w>", self.destroy)
         root.bind_all("<Command-q>", self.quit_project)
         
     def open_file(self, event=''):
@@ -141,6 +149,19 @@ class Editor:
         info = Label(about_window, text="""This is a text editor made by Luke Carlson (github.com/jLukeC) over a few days in summer 2013.""")
         info.pack()
         
+    def destroy(self, event=''):
+        focus=root.focus_get()
+        focus_parent_string=focus.winfo_parent()
+        focus_parent = root.nametowidget(focus_parent_string)
+        unbind_destroy(focus_parent)
+        focus_parent.wm_withdraw()
+        try:
+            focus_parent.wm_withdraw()
+        except: print "damn1"
+        try:
+            focus_parent.destroy()
+        except: print "damn"
+
     def quit_project(self):
         sys.exit()
         
