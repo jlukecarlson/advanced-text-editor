@@ -90,8 +90,8 @@ class Editor:
         root.config(menu=menubar)
 
 
+        root.bind_all("<Command-,>", self.launch_html_viewer)
         root.bind_all("<Command-m>", self.view_html)
-
         root.bind_all("<Command-n>", self.new_window)
         root.bind_all("<Command-o>", self.open_file)
         root.bind_all("<Command-s>", self.save_file)
@@ -101,21 +101,32 @@ class Editor:
         root.bind_all("<Command-q>", self.quit_project)
 
 
+    def markdowner(self, event=''):
+        focus=root.focus_get()
+        print markdown2.markdown(focus.get(1.0, END))
     def view_html(self, event=''):
         focus=root.focus_get()
         file_extension = os.path.splitext(focus.master.title())[1]
         print file_extension
         if (file_extension == ".md"): #checks if it is markdown
-            html = markdown2.markdown(focus.get(1.0, END))
-            print html
-            save_file = open(os.path.splitext(focus.master.title())[0] + ".html", 'w')
-            save_file.write(html)
-            print save_file.name
-            launch_html_viewer(url=save_file.name)
+ #           html = markdown2.markdown(focus.get(1.0, END))
+#            print html
+            try:
+                html = markdown2.markdown(focus.get(1.0, END))
+                print html
+                save_file = open(os.path.splitext(focus.master.title())[0] + ".html", 'w')
+                save_file.write(html)
+                print save_file.name
+                self.launch_html_viewer(url=save_file.name)
+            except:
+                print "couldnt convert markdown to html"
+            
+ 
         else:
-            launch_html_viewer()
+            self.launch_html_viewer()
             
     def launch_html_viewer(self, event='', url=''):
+        print url
         focus=root.focus_get()
         if url == '':
             url = focus.master.title()
@@ -123,14 +134,17 @@ class Editor:
             self.html_window=Toplevel(root)
             self.html_window.wm_title("HTML Viewer")
             self.html_viewer=tkHTMLViewer(self.html_window)
+            self.html_viewer.url=os.path.basename(url)
             try:
-                self.html_viewer.display(url)
+                self.html_viewer.display(url)# for local: os.path.basename(url)
+                print url + "viewed"
             except:
                 print "html section couldnt work"
         else:
-            self.html_viewer.display(url)
+ #           self.html_viewer.display(url)
+            
             try:
-                self.html_viewer.display(focus.master.title())
+                self.html_viewer.display(url) 
             except:
                 print "html section couldnt work"
   
@@ -209,6 +223,9 @@ class Editor:
 if __name__=='__main__':
     root = Tk()
     root.wm_title("Luke's Text Editor")
+    htmlw = Toplevel(root)
+    htmlv = tkHTMLViewer(htmlw)
+    htmlv.display("/Users/Luke/programming/projects/advanced-text-editor/myfile.html")
     app = Editor(root)
     root.mainloop()
 
